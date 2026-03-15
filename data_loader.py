@@ -416,12 +416,14 @@ def build_cv_loaders(cfg: dict, full_train_dir: Optional[str] = None) -> Generat
             num_workers = 0
             pin_memory  = False
 
+        cv_sampler = make_weighted_sampler(train_subset)
         train_loader = DataLoader(
             train_subset,
             batch_size=cfg["training"]["batch_size"],
-            shuffle=True,
+            sampler=cv_sampler,
             num_workers=num_workers,
             pin_memory=pin_memory,
+            collate_fn=mixup_collate(cfg["augmentation"]["train"]["mixup_alpha"]),
             drop_last=True,
         )
         val_loader = DataLoader(

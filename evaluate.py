@@ -226,12 +226,14 @@ def plot_gradcam_samples(
 
         cam_np = cam.numpy()
         if cam_np.ndim == 1:       # ViT returns 1D tokens
-            side = int(cam_np.shape[0] ** 0.5)
-            if side * side < cam_np.shape[0]:
-                # Skip CLS token
-                cam_np = cam_np[1:]
-                side = int(cam_np.shape[0] ** 0.5)
-            cam_np = cam_np[:side * side].reshape(side, side)
+            n_tokens = cam_np.shape[0]
+            if n_tokens == 197:    # vit_base/small patch16_224: 14*14 + 1 CLS
+                cam_np = cam_np[1:].reshape(14, 14)
+            else:
+                # Skip CLS token and reshape to nearest square
+                tokens = cam_np[1:]
+                side = int(tokens.shape[0] ** 0.5)
+                cam_np = tokens[:side * side].reshape(side, side)
 
         cam_resized = cv2_lib.resize(cam_np, (img_np.shape[1], img_np.shape[0]))
         heatmap = plt.cm.jet(cam_resized)[:, :, :3]

@@ -8,6 +8,6 @@ Macro F1-Score,0.9802,,,Primary ranking metric
 AUC-ROC (macro),0.9991,,,Secondary ranking metric
 Inference Time (ms/img),374.34,,,Tiebreaker - lower is better
 Model Size (MB),643.0,,,Tiebreaker - smaller is better
-Training Time (min),0.0,,,Informational
-CV Mean F1 (5-fold),0.0000,,,Cross-validation generalization
+Training Time (min),46.9,,,Informational
+CV Mean F1 (5-fold),0.9975,,,Cross-validation generalization
 CV Std F1 (5-fold),0.0000,,,Cross-validation stability
