@@ -10,6 +10,8 @@ Supports:
 """
 
 import os
+os.environ["OPENCV_LOG_LEVEL"] = "ERROR"
+os.environ["OPENCV_IO_ENABLE_OPENEXR"] = "1" # sometimes helps with image loading
 import random
 import yaml
 import numpy as np

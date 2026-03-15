@@ -4,10 +4,10 @@
 # ============================================================
 
 data:
-  data_dir: "data_binary_backup"
-  train_dir: "data_binary_backup/train"
-  val_dir:   "data_binary_backup/val"
-  test_dir:  "data_binary_backup/test"
+  data_dir: "data"
+  train_dir: "data/train"
+  val_dir:   "data/val"
+  test_dir:  "data/test"
   img_size: 224          # resize all images to 224×224 (ViT standard)
   num_workers: 4
   pin_memory: true
@@ -15,8 +15,18 @@ data:
   # Classes are auto-detected from directory names at runtime.
   # Listed here for reference only (sorted alphabetically = label order).
   classes:
-    - "fractured"
-    - "not fractured"
+    - "Avulsion fracture"
+    - "Comminuted fracture"
+    - "Compression-Crush fracture"
+    - "Fracture Dislocation"
+    - "Greenstick fracture"
+    - "Hairline Fracture"
+    - "Impacted fracture"
+    - "Intra-articular fracture"
+    - "Longitudinal fracture"
+    - "Oblique fracture"
+    - "Pathological fracture"
+    - "Spiral Fracture"
 
 augmentation:
   train:
@@ -52,7 +62,7 @@ model:
 
 training:
   seed: 42
-  epochs: 10                     # more epochs for 12-class
+  epochs: 15                     # multi-class epochs
   batch_size: 16
   accumulation_steps: 4          # effective batch = 64
 
@@ -97,8 +107,9 @@ evaluation:
 
 output:
   checkpoint_dir: "checkpoints"
+  checkpoint_name: "best_model_multiclass"
   results_dir:    "results"
   log_dir:        "logs"
   save_best_only: true
-  final_results_csv:   "results/final_results.csv"
-  performance_csv:     "results/model_performance_analysis.csv"
+  final_results_csv:   "results/final_results_multiclass.csv"
+  performance_csv:     "results/model_performance_analysis_multiclass.csv"

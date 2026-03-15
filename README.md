@@ -1,21 +1,15 @@
 # Bone Fracture Classification
 **Kamand Bioengineering Group Hackathon 2025 | IIT Mandi**
 
-## Data Leakage Check & Clean Split
-Before training, detect and fix any cross-split duplicate leakage:
+## Dataset & Reorganization
+Before training, download and reorganize the 12-class dataset:
 
 ```bash
-# 1. Check for duplicates (exact SHA1 + perceptual hash)
-python scripts/dedupe_report.py --root ../../data/Bone_Fracture_Binary_Classification --output leak_report.csv
-
-# 2. Build leak-free 70/10/20 stratified splits (hardlinks, no extra disk)
-python scripts/clean_resplit.py \
-  --source ../../data/Bone_Fracture_Binary_Classification \
-  --dest   ../../data/clean_split \
-  --val 0.10 --test 0.20 --mode link --force
+# Downloads "bone-break-classifier-dataset" via kagglehub and maps into train/val/test splits
+python scripts/reorganize_multiclass.py
 ```
-Config is already pointed at `data/clean_split/`. To revert to the raw dataset,
-swap the commented paths in `config.yaml`.
+This script splits the **1,685** images into:
+- 70% Train, 10% Validation, 20% Test (stratified across 12 fracture classes).
 
 ## Architecture
 A **soft-voting ensemble** of three ImageNet-pretrained backbones:
@@ -35,8 +29,9 @@ Key design choices:
 - Apple Silicon (MPS) & CUDA auto-detection
 
 ## Dataset
-Binary classification: **fractured** vs **not fractured**
-- Train: ~9,246 images | Val: ~829 images | Test: ~506 images
+Multi-class classification: **12 Fracture Types**
+Avulsion, Comminuted, Compression-Crush, Fracture Dislocation, Greenstick, Hairline, Impacted, Intra-articular, Longitudinal, Oblique, Pathological, Spiral.
+- Train: 1173 images | Val: 163 images | Test: 349 images
 - Format: PNG/JPEG, variable resolution → standardized to 224×224
 
 ## Quick Start
@@ -44,14 +39,10 @@ Binary classification: **fractured** vs **not fractured**
 ```bash
 # 1. Install dependencies
 pip install -r requirements.txt
+pip install kagglehub
 
-# 2. Navigate to the project directory
-cd KBG_Hackathon_Submission/bone_fracture_classifier
-
-# 3. Run leakage check + clean resplit (one-time)
-python scripts/dedupe_report.py --root ../../data/Bone_Fracture_Binary_Classification
-python scripts/clean_resplit.py --source ../../data/Bone_Fracture_Binary_Classification \
-  --dest ../../data/clean_split --val 0.10 --test 0.20 --force
+# 2. Run data download & reorganization
+python scripts/reorganize_multiclass.py
 
 # 4. Train (single run)
 python train.py --config config.yaml
@@ -73,8 +64,7 @@ bone_fracture_classifier/
 ├── train.py                     # Training loop + epoch CSV logger
 ├── evaluate.py                  # Test metrics, confusion matrix, GradCAM
 ├── scripts/
-│   ├── dedupe_report.py         # SHA1 + pHash cross-split leakage detector
-│   └── clean_resplit.py         # Dedupe & stratified re-split builder
+│   └── reorganize_multiclass.py # Automatic dataset download and stratified train/val/test splitting
 ├── TEAM.txt                     # Team information
 ├── README.md                    # This file
 ├── checkpoints/
@@ -99,11 +89,11 @@ bone_fracture_classifier/
 | Parameter | Value |
 |---|---|
 | Image size | 224 × 224 |
-| Batch size (effective) | 64 (32 × 2 accumulation) |
-| Optimizer | AdamW (lr=1e-4, wd=1e-2) |
-| Scheduler | Cosine + 3-epoch warmup |
+| Batch size (effective) | 64 (16 × 4 accumulation) |
+| Optimizer | AdamW (lr=5e-5, wd=1e-2) |
+| Scheduler | Cosine + 5-epoch warmup |
 | Loss | Label Smoothing CE (ε=0.1) |
-| Epochs | 30 (early stop patience=7) |
+| Epochs | 40 (early stop patience=10) |
 | Mixed precision | fp16 (CUDA only) |
 
 ## Contact

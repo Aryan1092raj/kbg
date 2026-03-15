@@ -21,3 +21,5 @@ venv/
 .vscode/
 .idea/
 *.swp
+data_binary_backup/
+

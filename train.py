@@ -274,7 +274,9 @@ def train(cfg: dict, fold: Optional[int] = None, loaders: Optional[dict] = None)
     out_dir  = Path(cfg["output"]["checkpoint_dir"])
     out_dir.mkdir(parents=True, exist_ok=True)
     suffix   = f"_fold{fold}" if fold is not None else ""
-    ckpt_path = out_dir / f"best_model{suffix}.pth"
+    # Use a custom checkpoint name if specified, else default to best_model
+    ckpt_name = cfg["output"].get("checkpoint_name", "best_model")
+    ckpt_path = out_dir / f"{ckpt_name}{suffix}.pth"
 
     log_path = cfg["output"]["performance_csv"].replace(".csv", f"{suffix}.csv")
     logger   = EpochLogger(log_path)
